@@ -1,0 +1,10 @@
+{
+  "navigation": {
+    "home": "Home",
+    "headers": "Headers",
+    "elements": "Elements",
+    "buttons": "Buttons",
+    "cardCollections": "Card Collections",
+    "cards": "Cards"
+  }
+}

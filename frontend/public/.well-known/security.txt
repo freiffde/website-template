@@ -1,0 +1,5 @@
+Contact: mailto:security@tuemedia-it.de
+Expires: 2027-02-25T09:44:46.721Z
+Preferred-Languages: de, en
+Canonical: https://tuemedia-it.de/.well-known/security.txt
+Policy: https://tuemedia-it.de/privacy

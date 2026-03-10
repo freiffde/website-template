@@ -1,0 +1,17 @@
+{
+  "name": "Tuemedia IT Solutions",
+  "short_name": "Tuemedia IT",
+  "description": "Empowering businesses with innovative technology solutions and digital transformation expertise.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

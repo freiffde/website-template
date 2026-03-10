@@ -1,0 +1,33 @@
+services:
+  frontend:
+    image: tuemediaconsulting/tuemedia-it-frontend-prod:latest
+    container_name: tuemedia-it-frontend
+    ports:
+      - "127.0.0.1:3000:3000" # Expose frontend locally
+    networks:
+      - tuemedia-it-network
+
+  backend:
+    image: tuemediaconsulting/tuemedia-it-backend-prod:latest
+    container_name: tuemedia-it-backend
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks:
+      - tuemedia-it-network
+    volumes:
+      - tuemedia-it-db:/app/data
+    environment:
+      - DEBUG=0
+      - DJANGO_DB_PATH=/app/data/db.sqlite3
+      - EMAIL_HOST=${TueMediaIT_EMAIL_HOST}
+      - EMAIL_PORT=${TueMediaIT_EMAIL_PORT}
+      - EMAIL_USER=${TueMediaIT_EMAIL_USER}
+      - EMAIL_PASSWORD=${TueMediaIT_EMAIL_PASSWORD}
+      - CSRF_TRUSTED_ORIGINS=https://www.tuemedia-it.de,https://tuemedia-it.de
+
+networks:
+  tuemedia-it-network:
+    driver: bridge
+
+volumes:
+  tuemedia-it-db:

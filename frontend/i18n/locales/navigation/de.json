@@ -1,0 +1,10 @@
+{
+  "navigation": {
+    "home": "Startseite",
+    "headers": "Headers",
+    "elements": "Elemente",
+    "buttons": "Knöpfe",
+    "cardCollections": "Kartenkollektionen",
+    "cards": "Karten"
+  }
+}

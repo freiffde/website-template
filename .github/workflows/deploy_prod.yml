@@ -1,0 +1,86 @@
+name: Deploy Prod
+
+on:
+  push:
+    branches:
+      - prod
+  workflow_dispatch:
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "${{ secrets.TMC_DOCKER_HUB_SECRET }}" | docker login -u ${{ vars.TMC_DOCKER_HUB_USERNAME }} --password-stdin
+      - run: docker build -t tuemediaconsulting/tuemedia-it-frontend-prod:latest ./frontend
+      - run: docker push tuemediaconsulting/tuemedia-it-frontend-prod:latest
+
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "${{ secrets.TMC_DOCKER_HUB_SECRET }}" | docker login -u ${{ vars.TMC_DOCKER_HUB_USERNAME }} --password-stdin
+      - run: docker build -t tuemediaconsulting/tuemedia-it-backend-prod:latest ./backend
+      - run: docker push tuemediaconsulting/tuemedia-it-backend-prod:latest
+
+  deploy:
+    needs: [build-frontend, build-backend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > prod_ssh_key
+      - run: chmod 400 prod_ssh_key
+      - run: |
+          ssh -o StrictHostKeyChecking=no -i prod_ssh_key ${{ vars.PROD_USERNAME }}@${{ vars.PROD_HOSTNAME }} "
+            mkdir -p ~/tuemedia_it/docker
+          "
+      - run: scp -o StrictHostKeyChecking=no -i prod_ssh_key docker/docker-compose.yml ${{ vars.PROD_USERNAME }}@${{ vars.PROD_HOSTNAME }}:~/tuemedia_it/docker/docker-compose.yml
+      - run: |
+          ssh -o StrictHostKeyChecking=no -i prod_ssh_key ${{ vars.PROD_USERNAME }}@${{ vars.PROD_HOSTNAME }} "
+            echo '${{ secrets.TMC_DOCKER_HUB_SECRET }}' | docker login -u ${{ vars.TMC_DOCKER_HUB_USERNAME }} --password-stdin &&
+            echo 'Setting environment variables' &&
+            export TueMediaIT_EMAIL_HOST='${{ vars.TUEMEDIAIT_EMAIL_HOST }}' &&
+            export TueMediaIT_EMAIL_PORT='${{ vars.TUEMEDIAIT_EMAIL_PORT }}' &&
+            export TueMediaIT_EMAIL_USER='${{ vars.TUEMEDIAIT_EMAIL_USER }}' &&
+            export TueMediaIT_EMAIL_PASSWORD='${{ secrets.TUEMEDIAIT_EMAIL_PASSWORD }}' &&
+            echo 'Pulling latest images from Docker Hub' &&
+            docker compose -f ~/tuemedia_it/docker/docker-compose.yml pull &&
+            echo 'Stopping and removing old containers' &&
+            docker compose -f ~/tuemedia_it/docker/docker-compose.yml down || true &&
+            echo 'Starting new containers' &&
+            docker compose -f ~/tuemedia_it/docker/docker-compose.yml up -d &&
+            echo 'Deployment complete!'
+          "
+
+  cleanup-docker:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > prod_ssh_key
+      - run: chmod 400 prod_ssh_key
+      - run: |
+          ssh -o StrictHostKeyChecking=no -i prod_ssh_key ${{ vars.PROD_USERNAME }}@${{ vars.PROD_HOSTNAME }} "
+            echo 'Cleaning up old images' &&
+            docker system df &&
+            docker system prune -a -f --volumes &&
+            docker image prune -a -f &&
+            docker system df &&
+            echo 'Cleanup complete!'
+          "
+
+  cleanup-environment:
+    needs: [deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > prod_ssh_key
+      - run: chmod 400 prod_ssh_key
+      - run: |
+          ssh -o StrictHostKeyChecking=no -i prod_ssh_key ${{ vars.PROD_USERNAME }}@${{ vars.PROD_HOSTNAME }} "
+            echo 'Removing environment variables for backend (if set)' &&
+            unset TueMediaIT_EMAIL_HOST &&
+            unset TueMediaIT_EMAIL_PORT &&
+            unset TueMediaIT_EMAIL_USER &&
+            unset TueMediaIT_EMAIL_PASSWORD &&
+            echo 'Cleanup complete!'
+          "

@@ -1,0 +1,14 @@
+/* TEAM */
+Developer: Tuemedia IT Solutions
+Site: https://tuemedia-it.de
+Location: Germany
+
+/* THANKS */
+Framework: Nuxt.js
+Language: Vue.js
+
+/* SITE */
+Last update: 25.2.2026
+Standards: HTML5, CSS3, JavaScript ES6+
+Components: Vue.js, Nuxt.js, i18n
+Software: VS Code, Node.js

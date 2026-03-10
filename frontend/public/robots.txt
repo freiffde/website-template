@@ -1,0 +1,53 @@
+User-agent: *
+Disallow: /api/
+Disallow: /_nuxt/
+Disallow: /.nuxt/
+Allow: /
+
+User-agent: Googlebot
+Allow: /$
+Allow: /about$
+Allow: /services$
+Allow: /services/
+Allow: /services/*
+Allow: /products$
+Allow: /products/*
+Allow: /blog$
+Allow: /blog/
+Allow: /blog/*
+Allow: /contact$
+Allow: /imprint$
+
+User-agent: Seobility
+Allow: /$
+Allow: /about$
+Allow: /services$
+Allow: /services/
+Allow: /services/*
+Allow: /products$
+Allow: /products/*
+Allow: /blog$
+Allow: /blog/
+Allow: /blog/*
+Allow: /contact$
+Allow: /imprint$
+
+User-agent: Bingbot
+Allow: /$
+Allow: /about$
+Allow: /services$
+Allow: /services/
+Allow: /services/*
+Allow: /products$
+Allow: /products/*
+Allow: /blog$
+Allow: /blog/
+Allow: /blog/*
+Allow: /contact$
+Allow: /imprint$
+
+# Sitemap
+Sitemap: https://tuemedia-it.de/sitemap.xml
+
+# Crawl delay (optional - remove if not needed)
+Crawl-delay: 1
